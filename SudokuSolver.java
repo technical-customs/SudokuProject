@@ -58,7 +58,7 @@ public class SudokuSolver {
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
-                    if(x == c1){
+                    if(y == c1){
                         for(int i: grid[x][y].getCol(c2)){
                             cl.add(i);
                         }
@@ -73,20 +73,32 @@ public class SudokuSolver {
         public String toString(){
             StringBuilder sb = new StringBuilder();
             
-                for(int x = 0; x < row; x++){
-                    
-                    
-                    for(int w = 0; w < SNUMBER; w++){
-                        for(int y = 0; y < col; y++){
-                            sb.append(grid[x][y].getRow(w));
+            for(int x = 0; x < row; x++){
+                for(int w = 0; w < SNUMBER; w++){
+                    for(int y = 0; y < col; y++){
+                        sb.append(grid[x][y].getRowString(w));
+
+                        if(y != col-1){
+                            sb.append("|");
                         }
-                        sb.append("\n");
+                        if(y == col-1){
+                        }
                     }
                     sb.append("\n");
                 }
+                if(x != row-1){
+                    sb.append("-----------").append("\n");
+                }
+                if(x == row-1){
+                    sb.append("\n");
+                }
+            }
             return sb.toString();
         }
     }
+    
+    
+    
     public class SudokuCell{
         private int[][] cell = new int[row][col];
         
@@ -134,6 +146,22 @@ public class SudokuSolver {
             
             return cArray;
         }
+        public String getRowString(int r){
+            StringBuilder sb = new StringBuilder();
+            
+            for(int s: getRow(r)){
+                sb.append(s);
+            }
+            return sb.toString();
+        }
+        public String getColString(int c){
+            StringBuilder sb = new StringBuilder();
+            
+            for(int s: getCol(c)){
+                sb.append(s);
+            }
+            return sb.toString();
+        }
         
         public boolean checkCell(){
             //returns true if cell contains all 1-9
@@ -177,11 +205,11 @@ public class SudokuSolver {
                     }
                 }
                 if(x != row-1){
-                        sb.append("-----").append("\n");
-                    }
-                    if(x == row-1){
-                        sb.append("\n");
-                    }
+                    sb.append("-----").append("\n");
+                }
+                if(x == row-1){
+                    sb.append("\n");
+                }
             }
             
             return sb.toString();
@@ -208,14 +236,21 @@ public class SudokuSolver {
     
     public static void main(String[] args){
         SudokuSolver sSolver = new SudokuSolver();
+        SudokuGrid grid = sSolver.getGrid();
         
         SudokuCell sCell = sSolver.new SudokuCell();
         sCell.addNum(0, 1, 5);
         sCell.addNum(1, 1, 6);
         sCell.addNum(2, 1, 4);
-        sSolver.getGrid().setCell(2, 2, sCell);
+        grid.setCell(2, 2, sCell);
         
-        System.out.println(sSolver.getGrid().toString());
+        SudokuCell sCell2 = sSolver.new SudokuCell();
+        sCell.addNum(0, 1, 5);
+        sCell.addNum(1, 1, 6);
+        sCell.addNum(2, 1, 4);
+        grid.setCell(2, 0, sCell);
+        
+        System.out.println(grid.toString());
         
     }
 }
