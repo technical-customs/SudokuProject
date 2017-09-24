@@ -2,6 +2,7 @@
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +12,56 @@ public class SudokuSolver {
     final public int col = SNUMBER, row = SNUMBER;
     private SudokuGrid mainGrid;
     
-    
+    public class Pair<T,V>{
+        protected T t;
+        protected V v;
+        
+        public Pair(T t, V v){
+            this.t = t;
+            this.v = v;
+        }
+        public T getT(){
+            return t;
+        }
+        public void setT(T t){
+            this.t = t;
+        }
+        public V getV(){
+            return v;
+        }
+        public void setV(V v){
+            this.v = v;
+        }
+        
+        @Override
+        public boolean equals(Object obj){
+            if (obj == null) {
+                return false;
+            }
+            if (!Pair.class.isAssignableFrom(obj.getClass())) {
+                return false;
+            }
+            final Pair p = (Pair) obj;
+           
+            if(!t.equals(p.getT())){
+                return false;
+            }
+            return v.equals(p.getV());
+        }
+        
+        @Override
+        public String toString(){
+            return t + "," + v;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 53 * hash + Objects.hashCode(this.t);
+            hash = 53 * hash + Objects.hashCode(this.v);
+            return hash;
+        }
+    }
     
     public class SudokuGrid{
         final private SudokuCell[][] grid = new SudokuCell[row][col];
@@ -422,6 +472,13 @@ public class SudokuSolver {
             System.out.println("REMAINING - " + rl.toString());
         }
         
+        public void emptyCell(){
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    cell[x][y] = 0;
+                }
+            }
+        }
         public int[][] getCell(){
             return cell;
         }
@@ -443,6 +500,56 @@ public class SudokuSolver {
                     }
                 }
             }
+        }
+        
+        public void randomFill(int num){
+            emptyCell();
+            
+            LinkedList<Integer> ll = new LinkedList<>();
+            for(int x = 1; x <= 9; x++){
+                ll.add(x);
+            }
+            //create fill list of random ints from ll
+            LinkedList<Integer> fl = new LinkedList<>();
+            
+            for(int x = 0; x < num; x++){
+                int ri = new Random().nextInt(ll.size());
+                fl.add(ll.get(ri));
+                ll.remove(ri);
+            }
+            
+            System.out.println("USED - " + fl.toString());
+            System.out.println("REMAINING - " + ll.toString());
+            
+            //get random pairs
+            LinkedList<Pair> pl = new LinkedList<>();
+            for(int x = 0; x < num; x++){
+                boolean pass = false;
+                do{
+                    int rr = new Random().nextInt(row);
+                    int rc = new Random().nextInt(col);
+                    
+                    Pair p = new Pair(rr,rc);
+                    if(!pl.contains(p)){
+                        pl.add(p);
+                        pass = true;
+                    }
+                }while(!pass);
+            }
+            System.out.println("PAIRS - " + pl.toString());
+            
+            //assign random values to positions
+            for(int x = 0; x < num; x++){
+                int ri = new Random().nextInt(fl.size());
+                int rp = new Random().nextInt(pl.size());
+                Pair p = pl.get(rp);
+                
+                addNum((int)p.getT(),(int)p.getV(),fl.get(ri));
+                
+                fl.remove(ri);
+                pl.remove(rp);
+            }
+            
         }
         public void addNum(int r, int c, int num){
             for(int x = 0; x < row; x++){
@@ -571,16 +678,9 @@ public class SudokuSolver {
         SudokuSolver sSolver = new SudokuSolver();
         SudokuGrid grid = sSolver.getGrid();
         
-        SudokuCell sCell1 = sSolver.new SudokuCell();
-        sCell1.addNum(0, 1, 2);
-        SudokuCell sCell2 = sSolver.new SudokuCell();
-        sCell2.addNum(0, 2, 8);
-        SudokuCell sCell3 = sSolver.new SudokuCell();
-        sCell3.addNum(0, 0, 5);
-        
-        grid.setCell(0, 0, sCell1);
-        grid.setCell(0, 1, sCell2);
-        grid.setCell(0, 2, sCell3);
+        SudokuCell sCell = sSolver.new SudokuCell();
+        sCell.randomFill(3);
+        grid.setCell(0, 0, sCell);
         
         System.out.println(grid.toString());
         
