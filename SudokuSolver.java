@@ -77,18 +77,22 @@ public class SudokuSolver {
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
                     if(x == r1){
-                        ll.add(grid[x][y].getRow(r2));
+                        for(int i: grid[x][y].getRow(r2)){
+                            ll.add(i);
+                        }
                     }
                 }
             }
             
-            System.out.println(ll.toString());
+            System.out.print(ll.toString() + " - ");
             
             for(int a = 1; a <= 9; a++){
                 if(!ll.contains(a)){
+                    System.out.println("FALSE" + "\n");
                     return false;
                 }
             }
+            System.out.println("TRUE");
             return true;
             
         }
@@ -99,18 +103,22 @@ public class SudokuSolver {
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
                     if(y == c1){
-                        ll.add(grid[x][y].getCol(c2));
+                        for(int i: grid[x][y].getCol(c2)){
+                            ll.add(i);
+                        }
                     }
                 }
             }
             
-            System.out.println(ll.toString());
+            System.out.println(ll.toString() + " - ");
             
             for(int a = 1; a <= 9; a++){
                 if(!ll.contains(a)){
+                    System.out.println("FALSE" + "\n");
                     return false;
                 }
             }
+            System.out.println("TRUE");
             return true;
         }
         
