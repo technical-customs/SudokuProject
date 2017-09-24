@@ -1,9 +1,11 @@
 
-import java.util.Iterator;
+import display.LoggerDisplay;
 import java.util.LinkedList;
 import java.util.Random;
 
 public class SudokuSolver {
+    final public LoggerDisplay ld = new LoggerDisplay("Sudoku Solver");
+    
     private int SNUMBER = 3;
     final public int col = SNUMBER, row = SNUMBER;
     private SudokuGrid mainGrid;
@@ -72,53 +74,53 @@ public class SudokuSolver {
         
         public boolean checkRow(int r1, int r2){
             //check if row of each cell has 1-9
-            LinkedList ll = new LinkedList();
+            LinkedList<Integer> rl = new LinkedList<>();
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
                     if(x == r1){
                         for(int i: grid[x][y].getRow(r2)){
-                            ll.add(i);
+                            rl.add(i);
                         }
                     }
                 }
             }
             
-            System.out.print(ll.toString() + " - ");
+            ld.addToDisplay(rl.toString() + " - ");
             
             for(int a = 1; a <= 9; a++){
-                if(!ll.contains(a)){
-                    System.out.println("FALSE" + "\n");
+                if(!rl.contains(a)){
+                    ld.writeToDisplay("FALSE" + "\n");
                     return false;
                 }
             }
-            System.out.println("TRUE");
+            ld.writeToDisplay("TRUE");
             return true;
             
         }
         public boolean checkCol(int c1, int c2){
             //check if col of each cell has 1-9
-            LinkedList ll = new LinkedList();
+            LinkedList<Integer> cl = new LinkedList<>();
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
                     if(y == c1){
                         for(int i: grid[x][y].getCol(c2)){
-                            ll.add(i);
+                            cl.add(i);
                         }
                     }
                 }
             }
             
-            System.out.println(ll.toString() + " - ");
+            ld.addToDisplay(cl.toString() + " - ");
             
             for(int a = 1; a <= 9; a++){
-                if(!ll.contains(a)){
-                    System.out.println("FALSE" + "\n");
+                if(!cl.contains(a)){
+                    ld.writeToDisplay("FALSE" + "\n");
                     return false;
                 }
             }
-            System.out.println("TRUE");
+            ld.writeToDisplay("TRUE");
             return true;
         }
         
@@ -163,17 +165,17 @@ public class SudokuSolver {
         }
         
         public void fillGrid(){
-            LinkedList ll = new LinkedList();
+            LinkedList<Integer> ll = new LinkedList<>();
             ll.add(1);ll.add(2);ll.add(3);ll.add(4);ll.add(5);ll.add(6);ll.add(7);ll.add(8);ll.add(9);
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
                     if(ll.size() == 1){
-                        cell[x][y] = (int) ll.get(0);
+                        cell[x][y] = ll.get(0);
                         ll.remove(0);
                     }else{
                         int num = new Random().nextInt(ll.size());
-                        cell[x][y] = (int) ll.get(num);
+                        cell[x][y] = ll.get(num);
                         ll.remove(num);
                     }
                 }
@@ -296,8 +298,9 @@ public class SudokuSolver {
         SudokuSolver sSolver = new SudokuSolver();
         SudokuGrid grid = sSolver.getGrid();
         int count = 0;
+        boolean rt = false, ct = false;
         
-        do{
+        while(true){
         
         count++;
         for(int x = 0; x < sSolver.row ; x++){
@@ -307,10 +310,18 @@ public class SudokuSolver {
                 grid.setCell(x, y,cell);
             }
         }
-        System.out.println(grid.toString());
+        sSolver.ld.writeToDisplay(grid.toString());
+        rt = grid.checkRow(0, 0);
+        ct = grid.checkCol(0, 0);
+        if(!rt){
+            continue;
+        }
+        if(!ct){
+            continue;
+        }
+        break;
+        }
         
-        }while(!grid.checkRow(0, 0));
-        
-        System.out.println("WE HAVE SUCCESS!!! COUNT-" + count);
+        sSolver.ld.writeToDisplay("WE HAVE SUCCESS!!! COUNT-" + count);
     }
 }
