@@ -11,6 +11,8 @@ public class SudokuSolver {
     final public int col = SNUMBER, row = SNUMBER;
     private SudokuGrid mainGrid;
     
+    
+    
     public class SudokuGrid{
         final private SudokuCell[][] grid = new SudokuCell[row][col];
         
@@ -54,13 +56,11 @@ public class SudokuSolver {
                                                 rl.remove(i);
                                             }
                                         }
-                                        
                                     }
                                 }
                             }
                         }
                     }
-                    
                 }
             }
             System.out.println("USED - " + ul.toString());
@@ -73,7 +73,6 @@ public class SudokuSolver {
                         //in the cell in the grid
                         SudokuCell cell = grid[x][y];
                         
-                                
                         for(int xx = 0; xx < row; xx++){
                             for(int yy = 0; yy < col; yy++){
                                 if(xx == r2){
@@ -91,7 +90,79 @@ public class SudokuSolver {
                             }
                         }
                     }
+                }
+            }
+            
+            System.out.println("USED - " + ul.toString());
+            System.out.println("REMAINING - " + rl.toString());
+        }
+        
+        public void smartFillCol(int c1, int c2){
+            HashSet<Integer> ul = new HashSet<>();
+            ul.clear();
+            
+            LinkedList<Integer> ll = new LinkedList<>();
+            for(int x = 1; x <= 9; x++){
+                ll.add(x);
+            }
+            
+            LinkedList<Integer> rl = ll;
+            
+            
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
                     
+                    if(y == c1){
+                        //in the cell in the grid
+                        SudokuCell cell = grid[x][y];
+                        
+                        for(int xx = 0; xx < row; xx++){
+                            for(int yy = 0; yy < col; yy++){
+                                if(yy == c2){
+                                    //in the row in the cell
+                                    
+                                    for(int num: cell.getCol(yy)){
+                                        if(num != 0){
+                                            ul.add(num);
+                                            if(rl.contains(num)){
+                                                int i = rl.indexOf(num);
+                                                rl.remove(i);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            System.out.println("USED - " + ul.toString());
+            System.out.println("REMAINING - " + rl.toString());
+            
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    
+                    if(y == c1){
+                        //in the cell in the grid
+                        SudokuCell cell = grid[x][y];
+                        
+                        for(int xx = 0; xx < row; xx++){
+                            for(int yy = 0; yy < col; yy++){
+                                if(yy == c2){
+                                    
+                                    if(cell.getCell()[xx][yy] == 0){
+                                        int ri = new Random().nextInt(rl.size());
+                                        System.out.println("SELECTED - " + ri + " Value: " + rl.get(ri));
+
+                                        cell.getCell()[xx][yy] = rl.get(ri);
+                                        ul.add(rl.get(ri));
+                                        rl.remove(ri);
+
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             
@@ -149,6 +220,49 @@ public class SudokuSolver {
                 }
             }
             return cl;
+        }
+        
+        
+        public boolean checkRowForNum(int r1, int r2, int num){
+            //check if row contain num
+            LinkedList rl = new LinkedList();
+            
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(x == r1){
+                        
+                        for(int i: grid[x][y].getRow(r2)){
+                            rl.add(i);
+                        }
+                        
+                        if(rl.contains(num)){
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+            
+        }
+        public boolean checkColForNum(int c1, int c2, int num){
+            //check if col contains num
+            LinkedList cl = new LinkedList();
+            
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(y == c1){
+                        for(int i: grid[x][y].getCol(c2)){
+                            cl.add(i);
+                        }
+                        
+                        if(cl.contains(num)){
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            return false;
         }
         
         public boolean checkRow(int r1, int r2){
@@ -219,6 +333,7 @@ public class SudokuSolver {
             }
             return true;
         }
+        
         
         @Override
         public String toString(){
@@ -429,6 +544,10 @@ public class SudokuSolver {
         }
     }
     
+    
+    
+    
+    
     public SudokuSolver(){
         //create main grid
         mainGrid = new SudokuGrid();
@@ -440,6 +559,7 @@ public class SudokuSolver {
     public int getSNumber(){
         return SNUMBER;
     }
+    
     public void setGrid(SudokuGrid mainGrid){
         this.mainGrid = mainGrid;
     }
@@ -464,9 +584,8 @@ public class SudokuSolver {
         
         System.out.println(grid.toString());
         
-        grid.smartFillRow(0, 0);
+        //grid.smartFillRow(0, 0);
         
-        System.out.println(grid.toString());
         
         int count = 0;
         boolean rt = false, ct = false;
