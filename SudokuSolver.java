@@ -74,6 +74,92 @@ public class SudokuSolver {
             }
         }
         
+        public void randomFill(int num){
+            //create fill list of random ints from ll
+            LinkedList<Integer> rl = new LinkedList<>();
+            
+            //get average num
+            int nd = num;
+            int av = num/(SNUMBER*SNUMBER);
+            //System.out.println("Av:"+av);
+            
+            //create random amounts for random fills
+            boolean ok = false;
+            do{
+                
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    grid[x][y].emptyCell();
+            
+                    LinkedList<Integer> ll = new LinkedList<>();
+                    for(int a = 1; a <= 9; a++){
+                        ll.add(a);
+                    }
+                    
+                    int rn = 0;
+                    boolean pass = false;
+                    do{
+                        rn = new Random().nextInt(av+3)+1;
+                        
+                        if(nd-rn >= 0){
+                            pass = true;
+                        }
+                    }while(!pass);
+                    
+                    rl.add(rn);
+                    nd -= rn;
+                    
+                    if(nd == 0 && rl.size() <= (SNUMBER*SNUMBER)){
+                        ok = true;
+                        break;
+                    }
+                }
+            }
+            }while(!ok);
+            
+            System.out.println("RandomList - " + rl);
+            
+            LinkedList<Pair> pl = new LinkedList<>();
+            for(int x = 0; x < rl.size(); x++){
+                //assign random positions to amounts
+                boolean pass = false;
+                do{
+                    int rr = new Random().nextInt(row);
+                    int rc = new Random().nextInt(col);
+                    Pair p = new Pair(rr,rc);
+
+                    if(!pl.contains(p)){
+                        pl.add(p);
+                        pass = true;
+                    }
+                }while(!pass);
+            }
+            System.out.println("PairList - " + pl.toString());
+            
+            int n = pl.size();
+            System.out.println("N size = " + n);
+            
+            for(int x = 0; x < n ; x++){
+                
+                int ri = new Random().nextInt(rl.size());
+                int i = rl.get(ri);
+                
+                int pi = new Random().nextInt(pl.size());
+                Pair p = pl.get(pi);
+                
+                System.out.println("Pair - " + p.toString() + "Value:" + i);
+                
+                SudokuCell cell = getCell((int)p.getT(),(int)p.getV());
+                cell.randomFill(i);
+                
+                rl.remove(ri);
+                pl.remove(pi);
+            }
+            
+            System.out.println("RandomList - " + rl.toString());
+            System.out.println("PairList - " + pl.toString());
+
+        }
         public void smartFillRow(int r1, int r2){
             HashSet<Integer> ul = new HashSet<>();
             ul.clear();
@@ -113,8 +199,8 @@ public class SudokuSolver {
                     }
                 }
             }
-            System.out.println("USED - " + ul.toString());
-            System.out.println("REMAINING - " + rl.toString());
+            //System.out.println("USED - " + ul.toString());
+            //System.out.println("REMAINING - " + rl.toString());
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -143,10 +229,9 @@ public class SudokuSolver {
                 }
             }
             
-            System.out.println("USED - " + ul.toString());
-            System.out.println("REMAINING - " + rl.toString());
+            //System.out.println("USED - " + ul.toString());
+            //System.out.println("REMAINING - " + rl.toString());
         }
-        
         public void smartFillCol(int c1, int c2){
             HashSet<Integer> ul = new HashSet<>();
             ul.clear();
@@ -186,8 +271,8 @@ public class SudokuSolver {
                     }
                 }
             }
-            System.out.println("USED - " + ul.toString());
-            System.out.println("REMAINING - " + rl.toString());
+            //System.out.println("USED - " + ul.toString());
+            //System.out.println("REMAINING - " + rl.toString());
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -216,8 +301,8 @@ public class SudokuSolver {
                 }
             }
             
-            System.out.println("USED - " + ul.toString());
-            System.out.println("REMAINING - " + rl.toString());
+            //System.out.println("USED - " + ul.toString());
+            //System.out.println("REMAINING - " + rl.toString());
         }
         
         public void setCell(int r, int c, SudokuCell cell){
@@ -239,7 +324,6 @@ public class SudokuSolver {
             }
             return null;
         }
-        
         
         public LinkedList<Integer> getRow(int r1, int r2){
             LinkedList<Integer> rl = new LinkedList<>();
@@ -413,6 +497,17 @@ public class SudokuSolver {
         }
     }
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public class SudokuCell{
         private int[][] cell = new int[row][col];
         
@@ -451,8 +546,8 @@ public class SudokuSolver {
                 }
             }
             
-            System.out.println("USED - " + ul.toString());
-            System.out.println("REMAINING - " + rl.toString());
+            //System.out.println("USED - " + ul.toString());
+            //System.out.println("REMAINING - " + rl.toString());
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -468,8 +563,8 @@ public class SudokuSolver {
                 }
             }
             
-            System.out.println("USED - " + ul.toString());
-            System.out.println("REMAINING - " + rl.toString());
+            //System.out.println("USED - " + ul.toString());
+            //System.out.println("REMAINING - " + rl.toString());
         }
         
         public void emptyCell(){
@@ -501,7 +596,6 @@ public class SudokuSolver {
                 }
             }
         }
-        
         public void randomFill(int num){
             emptyCell();
             
@@ -518,10 +612,11 @@ public class SudokuSolver {
                 ll.remove(ri);
             }
             
-            System.out.println("USED - " + fl.toString());
-            System.out.println("REMAINING - " + ll.toString());
+            //System.out.println("USED - " + fl.toString());
+            //System.out.println("REMAINING - " + ll.toString());
             
             //get random pairs
+            
             LinkedList<Pair> pl = new LinkedList<>();
             for(int x = 0; x < num; x++){
                 boolean pass = false;
@@ -536,7 +631,7 @@ public class SudokuSolver {
                     }
                 }while(!pass);
             }
-            System.out.println("PAIRS - " + pl.toString());
+            //System.out.println("PAIRS - " + pl.toString());
             
             //assign random values to positions
             for(int x = 0; x < num; x++){
@@ -679,8 +774,8 @@ public class SudokuSolver {
         SudokuGrid grid = sSolver.getGrid();
         
         SudokuCell sCell = sSolver.new SudokuCell();
-        sCell.randomFill(3);
-        grid.setCell(0, 0, sCell);
+        grid.randomFill(17);
+        //grid.setCell(0, 0, sCell);
         
         System.out.println(grid.toString());
         
