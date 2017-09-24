@@ -1,10 +1,11 @@
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 
 public class SudokuSolver {
     private int SNUMBER = 3;
-    final private int col = SNUMBER, row = SNUMBER;
+    final public int col = SNUMBER, row = SNUMBER;
     private SudokuGrid mainGrid;
     
     public class SudokuGrid{
@@ -69,6 +70,50 @@ public class SudokuSolver {
             return cl;
         }
         
+        public boolean checkRow(int r1, int r2){
+            //check if row of each cell has 1-9
+            LinkedList ll = new LinkedList();
+            
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(x == r1){
+                        ll.add(grid[x][y].getRow(r2));
+                    }
+                }
+            }
+            
+            System.out.println(ll.toString());
+            
+            for(int a = 1; a <= 9; a++){
+                if(!ll.contains(a)){
+                    return false;
+                }
+            }
+            return true;
+            
+        }
+        public boolean checkCol(int c1, int c2){
+            //check if col of each cell has 1-9
+            LinkedList ll = new LinkedList();
+            
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(y == c1){
+                        ll.add(grid[x][y].getCol(c2));
+                    }
+                }
+            }
+            
+            System.out.println(ll.toString());
+            
+            for(int a = 1; a <= 9; a++){
+                if(!ll.contains(a)){
+                    return false;
+                }
+            }
+            return true;
+        }
+        
         @Override
         public String toString(){
             StringBuilder sb = new StringBuilder();
@@ -97,8 +142,6 @@ public class SudokuSolver {
         }
     }
     
-    
-    
     public class SudokuCell{
         private int[][] cell = new int[row][col];
         
@@ -111,6 +154,23 @@ public class SudokuSolver {
             }
         }
         
+        public void fillGrid(){
+            LinkedList ll = new LinkedList();
+            ll.add(1);ll.add(2);ll.add(3);ll.add(4);ll.add(5);ll.add(6);ll.add(7);ll.add(8);ll.add(9);
+            
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(ll.size() == 1){
+                        cell[x][y] = (int) ll.get(0);
+                        ll.remove(0);
+                    }else{
+                        int num = new Random().nextInt(ll.size());
+                        cell[x][y] = (int) ll.get(num);
+                        ll.remove(num);
+                    }
+                }
+            }
+        }
         public void addNum(int r, int c, int num){
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -120,6 +180,7 @@ public class SudokuSolver {
                 }
             }
         }
+        
         public LinkedList<Integer> getRow(int r){
             //returns all ints int row 
             LinkedList<Integer> rArray = new LinkedList<>();
@@ -146,6 +207,22 @@ public class SudokuSolver {
             
             return cArray;
         }
+        
+        
+        public boolean checkCell(){
+            //returns true if cell contains 1-9
+            for(int a = 1; a <= 9; a++){
+                for(int x = 0; x < row; x++){
+                    for(int y = 0; x < col; x++){
+                        if(!getRow(x).contains(a)){
+                            return false;
+                        }
+                    }
+                }
+            }
+            
+            return true;
+        }
         public String getRowString(int r){
             StringBuilder sb = new StringBuilder();
             
@@ -162,33 +239,6 @@ public class SudokuSolver {
             }
             return sb.toString();
         }
-        
-        public boolean checkCell(){
-            //returns true if cell contains all 1-9
-            LinkedList<Integer> nl = new LinkedList<>();
-            nl.add(1);nl.add(2);nl.add(3);nl.add(4);nl.add(5);nl.add(6);nl.add(7);nl.add(8);nl.add(9);   
-            
-            for(int x = 0; x < row; x++){
-                for(int y = 0; y < col; y++){
-                    if(cell[x][y] == 0){
-                        return false;
-                    }
-                    Iterator<Integer> nli = nl.iterator();
-                    while(nli.hasNext()){
-                        int n = nli.next();
-                        
-                        if(n == cell[x][y]){
-                            nli.remove();
-                        }
-                    }
-                    if(nl.isEmpty()){
-                        System.out.println("Can move on");
-                    }
-                }
-            }
-            return true;
-        }
-        
         @Override
         public String toString(){
             StringBuilder sb = new StringBuilder();
@@ -237,20 +287,22 @@ public class SudokuSolver {
     public static void main(String[] args){
         SudokuSolver sSolver = new SudokuSolver();
         SudokuGrid grid = sSolver.getGrid();
+        int count = 0;
         
-        SudokuCell sCell = sSolver.new SudokuCell();
-        sCell.addNum(0, 1, 5);
-        sCell.addNum(1, 1, 6);
-        sCell.addNum(2, 1, 4);
-        grid.setCell(2, 2, sCell);
+        do{
         
-        SudokuCell sCell2 = sSolver.new SudokuCell();
-        sCell.addNum(0, 1, 5);
-        sCell.addNum(1, 1, 6);
-        sCell.addNum(2, 1, 4);
-        grid.setCell(2, 0, sCell);
-        
+        count++;
+        for(int x = 0; x < sSolver.row ; x++){
+            for(int y = 0; y < sSolver.col; y++){
+                SudokuCell cell = sSolver.new SudokuCell();
+                cell.fillGrid();
+                grid.setCell(x, y,cell);
+            }
+        }
         System.out.println(grid.toString());
         
+        }while(!grid.checkRow(0, 0));
+        
+        System.out.println("WE HAVE SUCCESS!!! COUNT-" + count);
     }
 }
