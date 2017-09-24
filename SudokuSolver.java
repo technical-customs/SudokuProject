@@ -2,6 +2,8 @@
 import display.LoggerDisplay;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SudokuSolver {
     final public LoggerDisplay ld = new LoggerDisplay("Sudoku Solver");
@@ -142,7 +144,7 @@ public class SudokuSolver {
                     sb.append("\n");
                 }
                 if(x != row-1){
-                    sb.append("-----------").append("\n");
+                    sb.append("-----------------").append("\n");
                 }
                 if(x == row-1){
                     sb.append("\n");
@@ -301,7 +303,11 @@ public class SudokuSolver {
         boolean rt = false, ct = false;
         
         while(true){
-        
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SudokuSolver.class.getName()).log(Level.SEVERE, null, ex);
+            }
         count++;
         for(int x = 0; x < sSolver.row ; x++){
             for(int y = 0; y < sSolver.col; y++){
