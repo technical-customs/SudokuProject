@@ -86,7 +86,7 @@ public class SudokuSolver {
             boolean ok = false;
             
             do{
-                
+                //creates list for fill numbers
                 for(int x = 0; x < row; x++){
                     for(int y = 0; y < col; y++){
                         grid[x][y].emptyCell();
@@ -112,6 +112,7 @@ public class SudokuSolver {
                 }
             }while(!ok);
             
+            //creates list of grid places
             LinkedList<Pair> pl = new LinkedList<>();
             for(int x = 0; x < rl.size(); x++){
                 boolean pass = false;
@@ -129,41 +130,25 @@ public class SudokuSolver {
             
             int n = pl.size();
 
-            for(int x = 0; x < 1 ; x++){
+            //for each place, assign number and fill the cell
+            for(int x = 0; x < 2 ; x++){
+                //random number
                 int ri = new Random().nextInt(rl.size());
                 int i = rl.get(ri);
                 
+                //random place/cell
                 int pi = new Random().nextInt(pl.size());
                 Pair p = pl.get(pi);
-                
                 SudokuCell cell = getCell((int)p.getT(),(int)p.getV());
+                
+                System.out.println("Fill - " + i + " Cell(s)");
                 System.out.println("P - " + p.toString());
+                System.out.println(cell.toString());
                 
-                boolean rt = false, ct = false;
+                fillCell( (int)p.getT(),(int)p.getV() , i);
                 
-                do{
-                    cell.randomFill(i);
-                    System.out.println(cell.toString());
+                System.out.println(cell.toString());
 
-                    for(int xx = 0; xx < row; xx++){
-                        for(int yy = 0; yy < col; yy++){
-                            int cn;
-
-                            if(cell.getCell()[xx][yy] != 0){
-                                cn = cell.getCell()[xx][yy];
-                                
-                                rt = checkRowForNum((int)p.getT(),xx,cn);
-                                ct = checkColForNum((int)p.getV(),yy,cn);
-
-                                System.out.println("CHECKING GRID ROW - " + rt);
-                                System.out.println("CHECKING GRID COL - " + ct);
-
-                            }
-
-                        }
-                    }
-                }while(!rt && !ct);
-                
                 rl.remove(ri);
                 pl.remove(pi);
             }
@@ -313,6 +298,87 @@ public class SudokuSolver {
             //System.out.println("REMAINING - " + rl.toString());
         }
         
+        
+        public void fillCell(int r, int c, int num){
+            if(num == 0){
+                return;
+            }
+            SudokuCell cell = getCell(r,c);
+            if(cell == null){
+                return;
+            }
+            cell.emptyCell();
+            
+            LinkedList<Integer> ll = new LinkedList<>();
+            for(int x = 1; x <= 9; x++){
+                ll.add(x);
+            }
+            
+            //create fill list of random ints from ll
+            LinkedList<Integer> fl = new LinkedList<>();
+            
+            for(int x = 0; x < num; x++){
+                int ri = new Random().nextInt(ll.size());
+                fl.add(ll.get(ri));
+                ll.remove(ri);
+            }
+            
+            //get random pairs
+            
+            LinkedList<Pair> pl = new LinkedList<>();
+            for(int x = 0; x < num; x++){
+                boolean pass = false;
+                do{
+                    int rr = new Random().nextInt(r);
+                    int rc = new Random().nextInt(c);
+                    
+                    Pair p = new Pair(rr,rc);
+                    if(!pl.contains(p)){
+                        pl.add(p);
+                        pass = true;
+                    }
+                }while(!pass);
+            }
+            //System.out.println("PAIRS - " + pl.toString());
+            
+            //assign random values to positions
+            for(int x = 0; x < num; x++){
+                
+                boolean pass = true;
+                
+                do{
+                    int ri = new Random().nextInt(fl.size());
+                    int rp = new Random().nextInt(pl.size());
+                    Pair p = pl.get(rp);
+                
+                    boolean rt = checkRowForNum(r,(int)p.getT(),fl.get(ri));
+                    
+                    boolean ct = checkColForNum(c,(int)p.getV(), fl.get(ri));
+                    
+                    if(!rt){
+                        System.out.println("Num not in row");
+                    }else if(rt){
+                        System.out.println("Num in row");
+                    }
+                    if(!ct){
+                        System.out.println("Num not in col");
+                    }else if(ct){
+                        System.out.println("Num in col");
+                    }
+                    
+                    if(!rt && !ct){
+                        System.out.println("Add - " + fl.get(ri) + " to " + p.getT() + "," + p.getV());
+                        cell.addNum((int)p.getT(),(int)p.getV(),fl.get(ri));
+                        fl.remove(ri);
+                        pl.remove(rp);
+                        pass = true;
+                    
+                    }
+                }while(!pass);
+                
+            }
+            
+        }
         public void setCell(int r, int c, SudokuCell cell){
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -367,16 +433,19 @@ public class SudokuSolver {
         
         public boolean checkRowForNum(int r1, int r2, int num){
             //check if row contain num
+            System.out.println("In check row");
             LinkedList rl = new LinkedList();
             
+            System.out.println("In search for row " + r1);
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
                     if(x == r1){
-                        
+                        System.out.println("In row " + x);
                         for(int i: grid[x][y].getRow(r2)){
                             rl.add(i);
                         }
                         
+                        System.out.println("Row List: " + rl);
                         if(rl.contains(num)){
                             return true;
                         }
@@ -504,17 +573,6 @@ public class SudokuSolver {
             return sb.toString();
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     public class SudokuCell{
         private int[][] cell = new int[row][col];
@@ -644,6 +702,7 @@ public class SudokuSolver {
                 int rp = new Random().nextInt(pl.size());
                 Pair p = pl.get(rp);
                 
+                
                 addNum((int)p.getT(),(int)p.getV(),fl.get(ri));
                 
                 fl.remove(ri);
@@ -751,10 +810,6 @@ public class SudokuSolver {
             return sb.toString();
         }
     }
-    
-    
-    
-    
     
     public SudokuSolver(){
         //create main grid
