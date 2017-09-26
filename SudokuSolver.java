@@ -119,7 +119,7 @@ public class SudokuSolver {
                 do{
                     int rr = new Random().nextInt(row);
                     int rc = new Random().nextInt(col);
-                    Pair p = new Pair(rr,rc);
+                    Pair<Integer, Integer> p = new Pair<>(rr,rc);
 
                     if(!pl.contains(p)){
                         pl.add(p);
@@ -128,10 +128,11 @@ public class SudokuSolver {
                 }while(!pass);
             }
             
-            int n = pl.size();
+            
 
             //for each place, assign number and fill the cell
-            for(int x = 0; x < 2 ; x++){
+            int n = pl.size();
+            for(int x = 0; x < n ; x++){
                 //random number
                 int ri = new Random().nextInt(rl.size());
                 int i = rl.get(ri);
@@ -141,13 +142,13 @@ public class SudokuSolver {
                 Pair p = pl.get(pi);
                 SudokuCell cell = getCell((int)p.getT(),(int)p.getV());
                 
-                System.out.println("Fill - " + i + " Cell(s)");
-                System.out.println("P - " + p.toString());
-                System.out.println(cell.toString());
+                //System.out.println("Fill - " + i + " Cell(s)");
+                //System.out.println("P - " + p.toString());
+                //System.out.println(cell.toString());
                 
                 fillCell( (int)p.getT(),(int)p.getV() , i);
                 
-                System.out.println(cell.toString());
+                //System.out.println(cell.toString());
 
                 rl.remove(ri);
                 pl.remove(pi);
@@ -298,7 +299,57 @@ public class SudokuSolver {
             //System.out.println("REMAINING - " + rl.toString());
         }
         
-        
+        public void smartFillCell(int r, int c){
+            SudokuCell cell = getCell(r,c);
+            
+            LinkedList<Integer> ll = new LinkedList<>();
+            for(int x = 1; x <= 9; x++){
+                ll.add(x);
+            }
+            //create fill list of random ints in cell
+            LinkedList<Pair> pl = new LinkedList<>();
+            LinkedList<Integer> fl = new LinkedList<>();
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(cell.getCell()[x][y] == 0){
+                        pl.add(new Pair<>(x,y));
+                    }else{
+                        fl.add(cell.getCell()[x][y]);
+                    }
+                    
+                }
+            }
+            ll.removeAll(fl);
+            
+            int n = pl.size();
+            for(int x = 0; x < n; x++){
+                boolean pass = false;
+                int checks = 0;
+                do{
+                    checks++;
+                    int li = new Random().nextInt(ll.size());
+                    int i = ll.get(li);
+                    int rp = new Random().nextInt(pl.size());
+                    Pair<Integer,Integer> p = pl.get(rp);
+                    
+                    boolean rt = checkRowForNum(r,p.getT(),i);
+                    boolean ct = checkColForNum(c,p.getV(),i);
+                    
+                    if(!rt && !ct){
+                        //System.out.println("Add - " + fl.get(ri) + " to " + p.getT() + "," + p.getV());
+                        cell.addNum(p.getT(), p.getV(), i);
+                        ll.remove(li);
+                        pl.remove(rp);
+                        pass = true;
+                    }
+                    if(checks == 10){
+                        smartFillCell(r,c);
+                        break;
+                    }
+                }while(!pass);
+                
+            }
+        }
         public void fillCell(int r, int c, int num){
             if(num == 0){
                 return;
@@ -329,10 +380,10 @@ public class SudokuSolver {
             for(int x = 0; x < num; x++){
                 boolean pass = false;
                 do{
-                    int rr = new Random().nextInt(r);
-                    int rc = new Random().nextInt(c);
+                    int rr = new Random().nextInt(row);
+                    int rc = new Random().nextInt(col);
                     
-                    Pair p = new Pair(rr,rc);
+                    Pair<Integer, Integer> p = new Pair<>(rr,rc);
                     if(!pl.contains(p)){
                         pl.add(p);
                         pass = true;
@@ -344,9 +395,11 @@ public class SudokuSolver {
             //assign random values to positions
             for(int x = 0; x < num; x++){
                 
-                boolean pass = true;
+                boolean pass = false;
+                int checks = 0;
                 
                 do{
+                    checks++;
                     int ri = new Random().nextInt(fl.size());
                     int rp = new Random().nextInt(pl.size());
                     Pair p = pl.get(rp);
@@ -356,23 +409,27 @@ public class SudokuSolver {
                     boolean ct = checkColForNum(c,(int)p.getV(), fl.get(ri));
                     
                     if(!rt){
-                        System.out.println("Num not in row");
+                        //System.out.println("Num not in row");
                     }else if(rt){
-                        System.out.println("Num in row");
+                        //System.out.println("Num in row");
                     }
                     if(!ct){
-                        System.out.println("Num not in col");
+                        //System.out.println("Num not in col");
                     }else if(ct){
-                        System.out.println("Num in col");
+                        //System.out.println("Num in col");
                     }
                     
                     if(!rt && !ct){
-                        System.out.println("Add - " + fl.get(ri) + " to " + p.getT() + "," + p.getV());
+                        //System.out.println("Add - " + fl.get(ri) + " to " + p.getT() + "," + p.getV());
                         cell.addNum((int)p.getT(),(int)p.getV(),fl.get(ri));
                         fl.remove(ri);
                         pl.remove(rp);
                         pass = true;
                     
+                    }
+                    if(checks == 10){
+                        fillCell(r,c,num);
+                        break;
                     }
                 }while(!pass);
                 
@@ -433,19 +490,15 @@ public class SudokuSolver {
         
         public boolean checkRowForNum(int r1, int r2, int num){
             //check if row contain num
-            System.out.println("In check row");
-            LinkedList rl = new LinkedList();
+            LinkedList<Integer> rl = new LinkedList<>();
             
-            System.out.println("In search for row " + r1);
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
                     if(x == r1){
-                        System.out.println("In row " + x);
                         for(int i: grid[x][y].getRow(r2)){
                             rl.add(i);
                         }
                         
-                        System.out.println("Row List: " + rl);
                         if(rl.contains(num)){
                             return true;
                         }
@@ -457,7 +510,7 @@ public class SudokuSolver {
         }
         public boolean checkColForNum(int c1, int c2, int num){
             //check if col contains num
-            LinkedList cl = new LinkedList();
+            LinkedList<Integer> cl = new LinkedList<>();
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -478,7 +531,7 @@ public class SudokuSolver {
         
         public boolean checkRow(int r1, int r2){
             //check if row of each cell has 1-9
-            LinkedList rl = new LinkedList();
+            LinkedList<Integer> rl = new LinkedList<>();
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -504,7 +557,7 @@ public class SudokuSolver {
         }
         public boolean checkCol(int c1, int c2){
             //check if col of each cell has 1-9
-            LinkedList cl = new LinkedList();
+            LinkedList<Integer> cl = new LinkedList<>();
             
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -687,7 +740,7 @@ public class SudokuSolver {
                     int rr = new Random().nextInt(row);
                     int rc = new Random().nextInt(col);
                     
-                    Pair p = new Pair(rr,rc);
+                    Pair<Integer, Integer> p = new Pair<>(rr,rc);
                     if(!pl.contains(p)){
                         pl.add(p);
                         pass = true;
@@ -840,6 +893,14 @@ public class SudokuSolver {
         
         System.out.println(grid.toString());
         
+        
+        for(int x = 0; x < sSolver.row; x++){
+            for(int y = 0; y < sSolver.col; y++){
+                grid.smartFillCell(x, y);
+            }
+        }
+        
+        System.out.println(grid.toString());
         //grid.smartFillRow(0, 0);
         
         
@@ -848,26 +909,20 @@ public class SudokuSolver {
         
         boolean runner = false;
         while(runner){
-            //try {
-            //    Thread.sleep(10);
-            //} catch (InterruptedException ex) {
-            //    Logger.getLogger(SudokuSolver.class.getName()).log(Level.SEVERE, null, ex);
-            //}
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SudokuSolver.class.getName()).log(Level.SEVERE, null, ex);
+            }
             count++;
             for(int x = 0; x < sSolver.row ; x++){
                 for(int y = 0; y < sSolver.col; y++){
-                    SudokuCell cell = sSolver.new SudokuCell();
-                    cell.fillCell();
-                    grid.setCell(x, y,cell);
+                    grid.smartFillCell(x, y);
                 }
             }
             System.out.println(grid.toString());
             rt = grid.checkRow(0);
-            ct = grid.checkCol(0);
             if(!rt){
-                continue;
-            }
-            if(!ct){
                 continue;
             }
             break;
