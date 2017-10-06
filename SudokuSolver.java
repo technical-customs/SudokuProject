@@ -74,8 +74,31 @@ public class SudokuSolver {
             }
         }
         
+        public boolean smartFill(){
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    smartFillCell(x, y);
+                }
+            }
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(!grid[x][y].checkCell()){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        
+        private boolean genRandAmounts(){
+            
+            
+            
+            return true;
+        }
+        
         public void randomFill(int num){
-            //create fill list of random ints from ll
+            //create fill list of random ints from rl
             LinkedList<Integer> rl = new LinkedList<>();
             
             //get average num
@@ -94,8 +117,11 @@ public class SudokuSolver {
                         int rn = 0;
                         boolean pass = false;
                         do{
+                            //gen random amount for cell
                             rn = new Random().nextInt(av+3)+1;
 
+                            //if the random amount - remaining amount 
+                            // equals 0,
                             if(nd-rn >= 0){
                                 pass = true;
                             }
@@ -103,7 +129,8 @@ public class SudokuSolver {
 
                         rl.add(rn);
                         nd -= rn;
-
+                        
+                        
                         if(nd == 0 && rl.size() <= (SNUMBER*SNUMBER)){
                             ok = true;
                             break;
@@ -128,8 +155,6 @@ public class SudokuSolver {
                 }while(!pass);
             }
             
-            
-
             //for each place, assign number and fill the cell
             int n = pl.size();
             for(int x = 0; x < n ; x++){
@@ -154,6 +179,7 @@ public class SudokuSolver {
                 pl.remove(pi);
             }
         }
+        
         public void smartFillRow(int r1, int r2){
             HashSet<Integer> ul = new HashSet<>();
             ul.clear();
@@ -343,7 +369,7 @@ public class SudokuSolver {
                         pass = true;
                     }
                     if(checks == 10){
-                        smartFillCell(r,c);
+                        //smartFillCell(r,c);
                         break;
                     }
                 }while(!pass);
@@ -351,11 +377,8 @@ public class SudokuSolver {
             }
         }
         public void fillCell(int r, int c, int num){
-            if(num == 0){
-                return;
-            }
             SudokuCell cell = getCell(r,c);
-            if(cell == null){
+            if(cell == null || num == 0){
                 return;
             }
             cell.emptyCell();
@@ -428,7 +451,7 @@ public class SudokuSolver {
                     
                     }
                     if(checks == 10){
-                        fillCell(r,c,num);
+                        //fillCell(r,c,num);
                         break;
                     }
                 }while(!pass);
@@ -436,6 +459,10 @@ public class SudokuSolver {
             }
             
         }
+        
+        
+        
+        
         public void setCell(int r, int c, SudokuCell cell){
             for(int x = 0; x < row; x++){
                 for(int y = 0; y < col; y++){
@@ -465,7 +492,6 @@ public class SudokuSolver {
                         for(int i: grid[x][y].getRow(r2)){
                             rl.add(i);
                         }
-                        
                     }
                 }
             }
@@ -480,13 +506,11 @@ public class SudokuSolver {
                         for(int i: grid[x][y].getCol(c2)){
                             cl.add(i);
                         }
-                        
                     }
                 }
             }
             return cl;
         }
-        
         
         public boolean checkRowForNum(int r1, int r2, int num){
             //check if row contain num
@@ -498,7 +522,6 @@ public class SudokuSolver {
                         for(int i: grid[x][y].getRow(r2)){
                             rl.add(i);
                         }
-                        
                         if(rl.contains(num)){
                             return true;
                         }
@@ -506,7 +529,6 @@ public class SudokuSolver {
                 }
             }
             return false;
-            
         }
         public boolean checkColForNum(int c1, int c2, int num){
             //check if col contains num
@@ -518,15 +540,25 @@ public class SudokuSolver {
                         for(int i: grid[x][y].getCol(c2)){
                             cl.add(i);
                         }
-                        
                         if(cl.contains(num)){
                             return true;
                         }
                     }
                 }
             }
-            
             return false;
+        }
+        
+        public boolean checkGrid(){
+            for(int x = 0; x < row; x++){
+                for(int y = 0; y < col; y++){
+                    if(!grid[x][y].checkCell()){
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
         }
         
         public boolean checkRow(int r1, int r2){
@@ -542,18 +574,12 @@ public class SudokuSolver {
                     }
                 }
             }
-            
-            System.out.print(rl.toString() + " - ");
-            
             for(int a = 1; a <= 9; a++){
                 if(!rl.contains(a)){
-                    System.out.println("FALSE" + "\n");
                     return false;
                 }
             }
-            System.out.println("TRUE");
             return true;
-            
         }
         public boolean checkCol(int c1, int c2){
             //check if col of each cell has 1-9
@@ -568,16 +594,11 @@ public class SudokuSolver {
                     }
                 }
             }
-            
-            System.out.println(cl.toString() + " - ");
-            
             for(int a = 1; a <= 9; a++){
                 if(!cl.contains(a)){
-                    System.out.println("FALSE" + "\n");
                     return false;
                 }
             }
-            System.out.println("TRUE");
             return true;
         }
         
@@ -820,7 +841,12 @@ public class SudokuSolver {
             StringBuilder sb = new StringBuilder();
             
             for(int s: getRow(r)){
-                sb.append(s);
+                if(s == 0){
+                    sb.append(' ');
+                }else{
+                    sb.append(s);
+                }
+                
             }
             return sb.toString();
         }
@@ -885,49 +911,14 @@ public class SudokuSolver {
     
     public static void main(String[] args){
         SudokuSolver sSolver = new SudokuSolver();
+        
         SudokuGrid grid = sSolver.getGrid();
+        grid.randomFill(17);
         
         SudokuCell sCell = sSolver.new SudokuCell();
-        grid.randomFill(17);
         //grid.setCell(0, 0, sCell);
         
         System.out.println(grid.toString());
         
-        
-        for(int x = 0; x < sSolver.row; x++){
-            for(int y = 0; y < sSolver.col; y++){
-                grid.smartFillCell(x, y);
-            }
-        }
-        
-        System.out.println(grid.toString());
-        //grid.smartFillRow(0, 0);
-        
-        
-        int count = 0;
-        boolean rt = false, ct = false;
-        
-        boolean runner = false;
-        while(runner){
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(SudokuSolver.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            count++;
-            for(int x = 0; x < sSolver.row ; x++){
-                for(int y = 0; y < sSolver.col; y++){
-                    grid.smartFillCell(x, y);
-                }
-            }
-            System.out.println(grid.toString());
-            rt = grid.checkRow(0);
-            if(!rt){
-                continue;
-            }
-            break;
-        }
-        
-        //System.out.println("WE HAVE SUCCESS!!! COUNT-" + count);
     }
 }
